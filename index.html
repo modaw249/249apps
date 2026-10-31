@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101b2d">
+<title>249apps | متجر التطبيقات والألعاب</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0b1424;--card:#142238;--green:#16c79a;--text:#f4f7fb;--muted:#9aabc0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Tahoma,sans-serif}
+header{padding:22px 16px;background:#101e32;border-bottom:1px solid #26374c}
+.wrap{max-width:1100px;margin:auto;padding:0 15px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:52px;height:52px;border-radius:15px;background:#173d4c;color:#43e0b5;display:grid;place-items:center;font-size:21px;font-weight:bold}
+h1{font-size:24px;margin:0}
+.subtitle{color:var(--muted);font-size:13px;margin-top:6px}
+.hero{padding:27px 0 18px}
+.hero h2{font-size:23px;margin:0 0 8px}
+.hero p{color:var(--muted);margin:0}
+.search{width:100%;padding:15px;border-radius:12px;border:1px solid #30425b;background:#142238;color:white;font-size:16px;margin:18px 0}
+.categories{display:flex;gap:9px;overflow-x:auto;padding:4px 0 18px}
+.cat{border:1px solid #34455d;background:#142238;color:white;border-radius:25px;padding:10px 17px;white-space:nowrap;cursor:pointer}
+.cat.active{background:var(--green);color:#06251d;border-color:var(--green)}
+.section-title{font-size:19px;margin:12px 0 17px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px;padding-bottom:35px}
+.app{background:var(--card);border:1px solid #263950;border-radius:15px;padding:13px;min-width:0}
+.app img{width:65px;height:65px;object-fit:cover;border-radius:16px;background:#263950}
+.app h3{font-size:15px;margin:12px 0 6px;overflow-wrap:anywhere}
+.app p{font-size:12px;color:var(--muted);line-height:1.6;height:38px;overflow:hidden}
+.meta{font-size:11px;color:#91a7bc;margin:8px 0}
+.download{display:block;text-align:center;text-decoration:none;background:var(--green);color:#06251d;padding:10px;border-radius:9px;font-weight:bold;font-size:13px}
+.empty{text-align:center;color:var(--muted);padding:35px;grid-column:1/-1}
+footer{text-align:center;padding:25px;color:var(--muted);font-size:12px;border-top:1px solid #26374c}
+.admin{display:none;background:#142238;border:1px solid #34455d;border-radius:15px;padding:17px;margin:20px 0 35px}
+.admin input,.admin textarea,.admin select{width:100%;padding:12px;margin:7px 0 12px;background:#0b1424;border:1px solid #34455d;border-radius:9px;color:white;font-size:14px}
+.admin label{font-size:13px;color:#c5d1df}
+.btn{border:0;border-radius:9px;padding:12px 17px;background:var(--green);color:#06251d;font-weight:bold;cursor:pointer}
+.btn.secondary{background:#34455d;color:white}
+.btn.danger{background:#a83b4b;color:white}
+.admin-item{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #34455d;padding:12px 0}
+.admin-item span{font-size:13px}
+.hidden{display:none!important}
+.status{font-size:13px;color:#f2cf76;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+ <div class="wrap brand">
+  <div class="logo">249</div>
+  <div>
+   <h1>249apps</h1>
+   <div class="subtitle">متجر التطبيقات والألعاب</div>
+  </div>
+ </div>
+</header>
+
+<main class="wrap">
+ <section class="hero">
+  <h2>اكتشف تطبيقاتك وألعابك</h2>
+  <p>حمّل التطبيقات والألعاب بسهولة من 249apps</p>
+  <input id="search" class="search" placeholder="ابحث عن تطبيق أو لعبة..." aria-label="البحث">
+  <div class="categories" id="categories">
+   <button class="cat active" data-cat="الكل">الكل</button>
+   <button class="cat" data-cat="تطبيقات">تطبيقات</button>
+   <button class="cat" data-cat="ألعاب">ألعاب</button>
+   <button class="cat" data-cat="أدوات">أدوات</button>
+   <button class="cat" data-cat="تعليم">تعليم</button>
+  </div>
+ </section>
+
+ <h2 class="section-title">أحدث التطبيقات والألعاب</h2>
+ <section id="apps" class="grid">
+  <div class="empty">جارٍ تحميل التطبيقات...</div>
+ </section>
+
+ <section id="admin" class="admin">
+  <h2>لوحة إدارة 249apps</h2>
+  <div id="loginBox">
+   <p>تسجيل دخول المدير</p>
+   <label for="email">البريد الإلكتروني</label>
+   <input id="email" type="email" autocomplete="username" placeholder="البريد الإلكتروني">
+   <label for="password">كلمة المرور</label>
+   <input id="password" type="password" autocomplete="current-password" placeholder="كلمة المرور">
+   <button class="btn" id="login">تسجيل الدخول</button>
+  </div>
+
+  <div id="manageBox" class="hidden">
+   <p id="welcome"></p>
+   <h3 id="formTitle">إضافة تطبيق جديد</h3>
+   <input id="appId" type="hidden">
+   <label for="name">اسم التطبيق أو اللعبة</label>
+   <input id="name" placeholder="اسم التطبيق">
+   <label for="description">الوصف</label>
+   <textarea id="description" rows="3" placeholder="وصف التطبيق"></textarea>
+   <label for="category">التصنيف</label>
+   <select id="category">
+    <option>تطبيقات</option><option>ألعاب</option><option>أدوات</option><option>تعليم</option>
+   </select>
+   <label for="version">الإصدار</label>
+   <input id="version" placeholder="مثلاً 1.0">
+   <label for="iconFile">صورة التطبيق</label>
+   <input id="iconFile" type="file" accept="image/*">
+   <label for="appFile">ملف التطبيق APK أو ملف اللعبة</label>
+   <input id="appFile" type="file" accept=".apk,.zip,.html,.xapk">
+   <button class="btn" id="saveApp">حفظ التطبيق</button>
+   <button class="btn secondary" id="cancelEdit">إلغاء التعديل</button>
+   <p id="message" class="status"></p>
+   <h3>التطبيقات المنشورة</h3>
+   <div id="adminList"></div>
+   <button class="btn secondary" id="logout">تسجيل الخروج</button>
+  </div>
+ </section>
+</main>
+
+<footer>249apps © 2026 — متجر التطبيقات والألعاب</footer>
+
+<script>
+const SUPABASE_URL = "https://npuhvvcmcrnnpolhluaw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_BB_MtPi68CjcYVHTLZCpqg_l1QXMXzO";
+
+// ضع بريد المدير الذي أنشأته في Supabase Auth هنا
+const ADMIN_EMAIL = "PUT_ADMIN_EMAIL_HERE";
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const BUCKET = "app-files";
+
+let allApps = [];
+let activeCategory = "الكل";
+let currentUser = null;
+
+const $ = id => document.getElementById(id);
+
+function safe(value){
+ return String(value ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+function showMessage(message){
+ $("message").textContent = message;
+}
+
+async function loadApps(){
+ $("apps").innerHTML = '<div class="empty">جارٍ تحميل التطبيقات...</div>';
+ const {data,error} = await db.from("apps").select("*").order("created_at",{ascending:false});
+ if(error){
+  $("apps").innerHTML='<div class="empty">تعذر تحميل التطبيقات. تحقق من إعداد قاعدة البيانات.</div>';
+  console.error(error);
+  return;
+ }
+ allApps = data || [];
+ renderApps();
+ renderAdminList();
+}
+
+function renderApps(){
+ const query = $("search").value.trim().toLowerCase();
+ const filtered = allApps.filter(app=>{
+  const matchesCategory = activeCategory==="الكل" || app.category===activeCategory;
+  const matchesSearch = (app.name||"").toLowerCase().includes(query) ||
+   (app.description||"").toLowerCase().includes(query);
+  return matchesCategory && matchesSearch;
+ });
+
+ if(!filtered.length){
+  $("apps").innerHTML='<div class="empty">لا توجد تطبيقات حالياً.</div>';
+  return;
+ }
+
+ $("apps").innerHTML = filtered.map(app=>`
+  <article class="app">
+   <img src="${safe(app.icon_url || "")}" alt="صورة ${safe(app.name)}"
+    onerror="this.style.visibility='hidden'">
+   <h3>${safe(app.name)}</h3>
+   <p>${safe(app.description)}</p>
+   <div class="meta">${safe(app.category)} · الإصدار ${safe(app.version||"1.0")}</div>
+   <a class="download" href="${safe(app.file_url)}"
+    data-id="${safe(app.id)}" target="_blank" rel="noopener">تحميل</a>
+  </article>
+ `).join("");
+
+ document.querySelectorAll(".download").forEach(link=>{
+  link.addEventListener("click",async()=>{
+   const appId = link.dataset.id;
+   const {error} = await db.from("download_logs").insert({app_id:appId});
+   if(error) console.error("Download tracking:",error);
+  });
+ });
+}
+
+$("search").addEventListener("input",renderApps);
+
+$("categories").addEventListener("click",e=>{
+ const btn=e.target.closest("button[data-cat]");
+ if(!btn)return;
+ activeCategory=btn.dataset.cat;
+ document.querySelectorAll(".cat").forEach(b=>b.classList.toggle("active",b===btn));
+ renderApps();
+});
+
+function renderAdminList(){
+ if(!currentUser)return;
+ $("adminList").innerHTML=allApps.map(app=>`
+  <div class="admin-item">
+   <span>${safe(app.name)} — ${safe(app.category)}</span>
+   <div>
+    <button class="btn secondary" data-edit="${safe(app.id)}">تعديل</button>
+    <button class="btn danger" data-delete="${safe(app.id)}">حذف</button>
+   </div>
+  </div>
+ `).join("") || "<p>لا توجد تطبيقات منشورة.</p>";
+
+ $("adminList").querySelectorAll("[data-edit]").forEach(btn=>{
+  btn.addEventListener("click",()=>editApp(btn.dataset.edit));
+ });
+ $("adminList").querySelectorAll("[data-delete]").forEach(btn=>{
+  btn.addEventListener("click",()=>deleteApp(btn.dataset.delete));
+ });
+}
+
+async function checkSession(){
+ const {data} = await db.auth.getSession();
+ const user=data.session?.user;
+ if(user && user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase()){
+  currentUser=user;
+  showManager();
+ }
+}
+
+function showManager(){
+ $("loginBox").classList.add("hidden");
+ $("manageBox").classList.remove("hidden");
+ $("welcome").textContent="تم تسجيل الدخول: "+currentUser.email;
+ renderAdminList();
+}
+
+$("login").addEventListener("click",async()=>{
+ const email=$("email").value.trim();
+ const password=$("password").value;
+ const {data,error}=await db.auth.signInWithPassword({email,password});
+ if(error){alert("فشل تسجيل الدخول: "+error.message);return;}
+ if(data.user.email?.toLowerCase()!==ADMIN_EMAIL.toLowerCase()){
+  await db.auth.signOut();
+  alert("هذا الحساب غير مصرح له بإدارة المتجر.");
+  return;
+ }
+ currentUser=data.user;
+ showManager();
+});
+
+async function uploadFile(file,folder){
+ if(!file)return null;
+ const cleanName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+ const path=folder+"/"+Date.now()+"_"+cleanName;
+ const {error}=await db.storage.from(BUCKET).upload(path,file,{upsert:false});
+ if(error)throw error;
+ const {data}=db.storage.from(BUCKET).getPublicUrl(path);
+ return data.publicUrl;
+}
+
+$("saveApp").addEventListener("click",async()=>{
+ if(!currentUser){alert("سجل دخول المدير أولاً");return;}
+ const name=$("name").value.trim();
+ if(!name){showMessage("اكتب اسم التطبيق أولاً.");return;}
+ const id=$("appId").value;
+ const existing=allApps.find(a=>String(a.id)===String(id));
+ const iconFile=$("iconFile").files[0];
+ const appFile=$("appFile").files[0];
+ $("saveApp").disabled=true;
+ showMessage("جارٍ رفع الملفات وحفظ التطبيق...");
+ try{
+  let icon_url=existing?.icon_url||"";
+  let file_url=existing?.file_url||"";
+  if(iconFile)icon_url=await uploadFile(iconFile,"icons");
+  if(appFile)file_url=await uploadFile(appFile,"apps");
+  if(!file_url){showMessage("اختر ملف التطبيق أو اللعبة.");return;}
+
+  const record={
+   name,
+   description:$("description").value.trim(),
+   category:$("category").value,
+   version:$("version").value.trim()||"1.0",
+   icon_url,
+   file_url
+  };
+
+  let result;
+  if(id){
+   result=await db.from("apps").update(record).eq("id",id);
+  }else{
+   result=await db.from("apps").insert(record);
+  }
+  if(result.error)throw result.error;
+  resetForm();
+  showMessage("تم حفظ التطبيق بنجاح.");
+  await loadApps();
+ }catch(error){
+  console.error(error);
+  showMessage("حدث خطأ: "+error.message);
+ }finally{
+  $("saveApp").disabled=false;
+ }
+});
+
+function editApp(id){
+ const app=allApps.find(a=>String(a.id)===String(id));
+ if(!app)return;
+ $("appId").value=app.id;
+ $("name").value=app.name||"";
+ $("description").value=app.description||"";
+ $("category").value=app.category||"تطبيقات";
+ $("version").value=app.version||"1.0";
+ $("iconFile").value="";
+ $("appFile").value="";
+ $("formTitle").textContent="تعديل التطبيق";
+ window.scrollTo({top:$("admin").offsetTop,behavior:"smooth"});
+}
+
+async function deleteApp(id){
+ const app=allApps.find(a=>String(a.id)===String(id));
+ if(!app||!confirm("هل تريد حذف "+app.name+"؟"))return;
+ const {error}=await db.from("apps").delete().eq("id",id);
+ if(error){alert("تعذر الحذف: "+error.message);return;}
+ await loadApps();
+}
+
+function resetForm(){
+ ["appId","name","description","version","iconFile","appFile"].forEach(id=>$(id).value="");
+ $("category").value="تطبيقات";
+ $("formTitle").textContent="إضافة تطبيق جديد";
+}
+
+$("cancelEdit").addEventListener("click",resetForm);
+$("logout").addEventListener("click",async()=>{
+ await db.auth.signOut();
+ currentUser=null;
+ $("manageBox").classList.add("hidden");
+ $("loginBox").classList.remove("hidden");
+});
+
+if(new URLSearchParams(location.search).get("admin")==="1"){
+ $("admin").style.display="block";
+ checkSession();
+}
+
+loadApps();
+</script>
+</body>
+  </html>
