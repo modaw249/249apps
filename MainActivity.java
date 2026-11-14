@@ -89,6 +89,11 @@ public class MainActivity extends Activity {
                 } catch (ActivityNotFoundException e) {
                     filePathCallback = null;
                     callback.onReceiveValue(null);
+
+                    Toast.makeText(MainActivity.this,
+                            "تعذر فتح مدير الملفات",
+                            Toast.LENGTH_SHORT).show();
+
                     return false;
                 }
             }
@@ -132,12 +137,12 @@ public class MainActivity extends Activity {
 
                 manager.enqueue(request);
 
-                Toast.makeText(this,
+                Toast.makeText(MainActivity.this,
                         "بدأ تحميل الملف",
                         Toast.LENGTH_SHORT).show();
 
             } catch (Exception e) {
-                Toast.makeText(this,
+                Toast.makeText(MainActivity.this,
                         "تعذر بدء التحميل",
                         Toast.LENGTH_LONG).show();
             }
