@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -120,8 +121,8 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px;border-t
 const SUPABASE_URL = "https://npuhvvcmcrnnpolhluaw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_BB_MtPi68CjcYVHTLZCpqg_l1QXMXzO";
 
-// ضع بريد المدير الذي أنشأته في Supabase Auth هنا
-const ADMIN_EMAIL = "PUT_ADMIN_EMAIL_HERE";
+// بريد المدير
+const ADMIN_EMAIL = "bharabidegy@gmail.com";
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const BUCKET = "app-files";
@@ -348,4 +349,4 @@ if(new URLSearchParams(location.search).get("admin")==="1"){
 loadApps();
 </script>
 </body>
-  </html>
+</html>
