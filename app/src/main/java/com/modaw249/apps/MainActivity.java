@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.webkit.CookieManager;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -108,20 +109,31 @@ public class MainActivity extends Activity {
                     request.addRequestHeader("Cookie", cookies);
                 }
 
-                request.addRequestHeader("User-Agent", userAgent);
+                if (userAgent != null) {
+                    request.addRequestHeader("User-Agent", userAgent);
+                }
+
                 request.setTitle("تحميل من 249apps");
                 request.setDescription("جارٍ تنزيل الملف");
 
                 request.setNotificationVisibility(
                         DownloadManager.Request
-                        .VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                .VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+                String fileName = URLUtil.guessFileName(
+                        url, contentDisposition, mimeType);
 
                 request.setDestinationInExternalPublicDir(
                         Environment.DIRECTORY_DOWNLOADS,
-                        DownloadManager.Request.getFileNameFromUrl(url));
+                        fileName);
 
                 DownloadManager manager =
                         (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+
+                if (manager == null) {
+                    throw new IllegalStateException(
+                            "Download service is unavailable");
+                }
 
                 manager.enqueue(request);
 
@@ -154,7 +166,7 @@ public class MainActivity extends Activity {
 
             filePathCallback.onReceiveValue(
                     WebChromeClient.FileChooserParams
-                    .parseResult(resultCode, data));
+                            .parseResult(resultCode, data));
 
             filePathCallback = null;
         }
