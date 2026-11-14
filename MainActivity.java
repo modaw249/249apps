@@ -88,9 +88,7 @@ public class MainActivity extends Activity {
                     return true;
                 } catch (ActivityNotFoundException e) {
                     filePathCallback = null;
-                    Toast.makeText(MainActivity.this,
-                            "تعذر فتح مدير الملفات",
-                            Toast.LENGTH_SHORT).show();
+                    callback.onReceiveValue(null);
                     return false;
                 }
             }
@@ -129,7 +127,8 @@ public class MainActivity extends Activity {
                         fileName);
 
                 DownloadManager manager =
-                        (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                        (DownloadManager) getSystemService(
+                                DOWNLOAD_SERVICE);
 
                 manager.enqueue(request);
 
