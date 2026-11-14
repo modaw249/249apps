@@ -1,4 +1,3 @@
-
 package com.modaw249.apps;
 
 import android.app.Activity;
@@ -58,7 +57,7 @@ public class MainActivity extends Activity {
 
                 try {
                     startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                } catch (ActivityNotFoundException e) {
+                } catch (ActivityNotFoundException ignored) {
                     Toast.makeText(MainActivity.this,
                             "لا يوجد تطبيق لفتح هذا الرابط",
                             Toast.LENGTH_SHORT).show();
@@ -88,12 +87,6 @@ public class MainActivity extends Activity {
                     return true;
                 } catch (ActivityNotFoundException e) {
                     filePathCallback = null;
-                    callback.onReceiveValue(null);
-
-                    Toast.makeText(MainActivity.this,
-                            "تعذر فتح مدير الملفات",
-                            Toast.LENGTH_SHORT).show();
-
                     return false;
                 }
             }
@@ -116,13 +109,16 @@ public class MainActivity extends Activity {
                     request.addRequestHeader("Cookie", cookies);
                 }
 
-                request.addRequestHeader("User-Agent", userAgent);
+                if (userAgent != null) {
+                    request.addRequestHeader("User-Agent", userAgent);
+                }
+
                 request.setTitle("تحميل من 249apps");
                 request.setDescription("جارٍ تنزيل الملف");
 
                 request.setNotificationVisibility(
                         DownloadManager.Request
-                        .VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                .VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
                 String fileName = URLUtil.guessFileName(
                         url, contentDisposition, mimeType);
@@ -132,17 +128,21 @@ public class MainActivity extends Activity {
                         fileName);
 
                 DownloadManager manager =
-                        (DownloadManager) getSystemService(
-                                DOWNLOAD_SERVICE);
+                        (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+
+                if (manager == null) {
+                    throw new IllegalStateException(
+                            "Download service is unavailable");
+                }
 
                 manager.enqueue(request);
 
-                Toast.makeText(MainActivity.this,
+                Toast.makeText(this,
                         "بدأ تحميل الملف",
                         Toast.LENGTH_SHORT).show();
 
             } catch (Exception e) {
-                Toast.makeText(MainActivity.this,
+                Toast.makeText(this,
                         "تعذر بدء التحميل",
                         Toast.LENGTH_LONG).show();
             }
@@ -166,7 +166,7 @@ public class MainActivity extends Activity {
 
             filePathCallback.onReceiveValue(
                     WebChromeClient.FileChooserParams
-                    .parseResult(resultCode, data));
+                            .parseResult(resultCode, data));
 
             filePathCallback = null;
         }
